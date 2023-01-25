@@ -3,15 +3,19 @@ from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 import logging
 
-from djangolib.utils import chunked_list
 from django.conf import settings
 
 TIMEOUT = settings.CACHE_TIMEOUT
 
-# To see logs from this module add logging config 
+# To see logs from this module add logging config
 # for this logger name
 logger = logging.getLogger("cache_utils")
 logger.addHandler(logging.NullHandler())
+
+def chunked_list(long_list, chunk_size=20):
+    """Break a long list into chunks"""
+    for i in range(0, len(long_list), chunk_size):
+        yield long_list[i: i+chunk_size]
 
 
 def all_ins_from_cache(model_cls, order_by_fields=None, select_related = (None, ), prefetch_objs=(None, )):

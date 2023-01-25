@@ -29,7 +29,7 @@ class Dota2Player(CacheableModel):
         return '{0}(name={1},id={2})'.format(self.__class__.__name__, self.name, self.steamid).replace(' ', '_')
 ```
 
-### 3.2. cache operations using django_cacheable_model.utils methods
+### 3.2. Use cache operations from django_cacheable_model.utils
 ```python
 from django_cacheable_model.utils import all_ins_from_cache, model_ins_from_cache_by_fields
 
@@ -44,7 +44,8 @@ context['player'] = model_ins_from_cache_by_fields(Dota2Player, {'steamid': stea
 a) Add a sample project
 b) Add tests
 c) Cleanup code from AIModelStore
-d) Document use of select_related and prefetch_related
+d) Document use of select_related and prefetch_related  
+e) Check with newer version of Django (was built when Django was at 1.10)
 
 
 # 5. License

@@ -1,24 +1,25 @@
-from django.core.cache import cache
-from django.db import models
-from django.core.exceptions import ObjectDoesNotExist
 import logging
 
 from django.conf import settings
+from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
 
 TIMEOUT = settings.CACHE_TIMEOUT
 
 # To see logs from this module add logging config
 # for this logger name
-logger = logging.getLogger("cache_utils")
+logger = logging.getLogger('django_cacheable_model')
 logger.addHandler(logging.NullHandler())
+
 
 def chunked_list(long_list, chunk_size=20):
     """Break a long list into chunks"""
     for i in range(0, len(long_list), chunk_size):
-        yield long_list[i: i+chunk_size]
+        yield long_list[i: i + chunk_size]
 
 
-def all_ins_from_cache(model_cls, order_by_fields=None, select_related = (None, ), prefetch_objs=(None, )):
+def all_ins_from_cache(model_cls, order_by_fields=None, select_related=(None,), prefetch_objs=(None,)):
     """
     For Model class model_cls get 'all' instances from cache or get from DB and update cache.
     Depending on the size of the table, this may become unviable. So use on small tables.
@@ -40,9 +41,9 @@ def all_ins_from_cache(model_cls, order_by_fields=None, select_related = (None, 
     if instances is None:
         logger.info('Cache MISS for key[{0}]'.format(cache_key))
         if not order_by_fields:
-            order_by_fields = (model_cls._meta.pk.name, )
-        instances = list(model_cls.objects.all().select_related(*select_related).\
-                         prefetch_related(*prefetch_objs).\
+            order_by_fields = (model_cls._meta.pk.name,)
+        instances = list(model_cls.objects.all().select_related(*select_related). \
+                         prefetch_related(*prefetch_objs). \
                          order_by(*order_by_fields))
         each_ins_dict = {}
         if len(instances):
@@ -58,9 +59,9 @@ def all_ins_from_cache(model_cls, order_by_fields=None, select_related = (None, 
 
 
 def model_ins_from_cache_by_fields(model_cls, fields,
-                                   latest_field_name = None, 
-                                   select_related = (None, ),
-                                   prefetch_objs = (None,)):
+                                   latest_field_name=None,
+                                   select_related=(None,),
+                                   prefetch_objs=(None,)):
     """
     Try to get cached model instance with primary key pk. If not get from db and store in cache.
     @param model_cls: Django model class
@@ -76,27 +77,27 @@ def model_ins_from_cache_by_fields(model_cls, fields,
     assert model_cls is not None
     assert issubclass(model_cls, models.Model)
     assert len(fields) > 0
-    
+
     cache_key = model_cls.format_fields_cache_key_template(fields)
     model_ins = cache.get(cache_key)
     if model_ins is None:
         logger.info('Cache MISS for key[{0}]'.format(cache_key))
         try:
-            #queryset
-            model_ins = model_cls.objects.filter(**fields)\
-                .select_related(*select_related)\
+            # queryset
+            model_ins = model_cls.objects.filter(**fields) \
+                .select_related(*select_related) \
                 .prefetch_related(*prefetch_objs)
-            #make instances by evaluating queryset
+            # make instances by evaluating queryset
             if latest_field_name is not None:
-                model_ins = (model_ins.latest(latest_field_name), )
+                model_ins = (model_ins.latest(latest_field_name),)
             else:
                 model_ins = tuple(model_ins)
 
-            #if not empty, set to cache
+            # if not empty, set to cache
             if len(model_ins):
                 cache.set(cache_key, model_ins)
             else:
-                model_ins=(None, ) #for consistency in return
+                model_ins = (None,)  # for consistency in return
         except ObjectDoesNotExist as odne:
             logger.exception(odne)
             return (None,)
@@ -105,6 +106,7 @@ def model_ins_from_cache_by_fields(model_cls, fields,
             return (None,)
     logger.info('model_ins_from_cache_by_fields is {0}'.format(model_ins))
     return model_ins
+
 
 def get_cache_data(key):
     """
@@ -124,6 +126,7 @@ def get_cache_data(key):
         logger.exception(e)
     return data
 
+
 def set_cache_key(key, data, timeout=TIMEOUT):
     """
     Set data to cache with key
@@ -134,8 +137,8 @@ def set_cache_key(key, data, timeout=TIMEOUT):
     logger.debug('Trying to set_cache_key for key [{0}] with data [{1}]'.format(key, data))
     success = False
     try:
-        cache.set(key, data, timeout = timeout)
-        success=True
+        cache.set(key, data, timeout=timeout)
+        success = True
         logger.info('set_cache_key succeeded for key [{0}]'.format(key))
     except Exception as e:
         logger.exception(e)
@@ -157,7 +160,7 @@ def invalidate_cache_on_model_updates(cls, fields):
         cache.delete(cache_key_all)
         logger.debug('Invalidated cache keys {0} {1}'.format(cache_key_on_fields, cache_key_all))
     except Exception as e:
-        success= False
+        success = False
         logger.exception(e)
     finally:
         return success

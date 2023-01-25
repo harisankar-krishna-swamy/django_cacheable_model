@@ -2,8 +2,10 @@
 A cacheable model for django.
 
 * A generic way of creating cache keys from Django model fields
-* Retrieve django models from cache with field values (cache along the way if not found). See usage example below
+* Retrieve django models from cache with field values (cache along the way if not found)
 * Retrieve all the model instances (suitable for small set of models)
+
+See usage example below
 
 # 1. Github
 https://github.com/harisankar-krishna-swamy/django_cacheable_model
@@ -40,7 +42,9 @@ context['player'] = model_ins_from_cache_by_fields(Dota2Player, {'steamid': stea
 
 # 4. To do
 a) Add a sample project
-b) Migrate tests from AIM
+b) Add tests
+c) Cleanup code from AIModelStore
+d) Document use of select_related and prefetch_related
 
 
 # 5. License

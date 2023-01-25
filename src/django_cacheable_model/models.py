@@ -1,8 +1,6 @@
 from itertools import chain
+
 from django.db import models
-from django.db.models import CharField
-from django.db.models.fields import DateTimeField
-from rest_framework.exceptions import ValidationError
 
 
 class CacheableModel(models.Model):

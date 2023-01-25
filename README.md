@@ -41,9 +41,9 @@ context['player'] = model_ins_from_cache_by_fields(Dota2Player, {'steamid': stea
 ```
 
 # 4. To do
-a) Add a sample project
-b) Add tests
-c) Cleanup code from AIModelStore
+a) Add a sample project  
+b) Add tests  
+c) Cleanup code from AIModelStore  
 d) Document use of select_related and prefetch_related  
 e) Check with newer version of Django (was built when Django was at 1.10)
 

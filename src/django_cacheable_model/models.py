@@ -4,14 +4,14 @@ from django.db import models
 
 
 class CacheableModel(models.Model):
-    '''
+    """
     When this model appears in another model as a Foreignkey or one-to-one
     this field will indicate the model in the cache key.
 
     For example: as cache key for Player totals may need to indicate
     the player for which the total is cached.
     Example key: PlayerTotals.10.Player.<related_cache_fieldname>
-    '''
+    """
     related_cache_fieldname = 'id'
 
     @classmethod
@@ -31,7 +31,7 @@ class CacheableModel(models.Model):
         Calling code has iterable of field, value pairs. It needs the cache key for the model
         based on those fields, values pairs.
         @param fields: a dict. key is usually model field's name. value is model field's value.
-                    It can be any thing that worked with objects.filter(**fields).
+                    It can be anything that worked with objects.filter(**fields).
         """
         template = cls.fields_cache_key_template(len(fields))
         # To maintain cache key consistency. The key is made from sorted field names

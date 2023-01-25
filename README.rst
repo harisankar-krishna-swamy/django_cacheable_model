@@ -48,5 +48,5 @@ d) Document use of select_related and prefetch_related
 
 
 # 5. License
+This was coded sometime ago during Django 1.10 and is open source now.
 Apache2 License
-

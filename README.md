@@ -46,6 +46,7 @@ b) Add tests
 c) Cleanup code from AIModelStore  
 d) Document use of select_related and prefetch_related  
 e) Check with newer version of Django (was built when Django was at 1.10)
+f) Remove Python2 styles
 
 
 # 5. License

@@ -12,6 +12,7 @@ class CacheableModel(models.Model):
     the player for which the total is cached.
     Example key: PlayerTotals.10.Player.<related_cache_fieldname>
     """
+
     related_cache_fieldname = 'id'
 
     @classmethod
@@ -35,13 +36,18 @@ class CacheableModel(models.Model):
         """
         template = cls.fields_cache_key_template(len(fields))
         # To maintain cache key consistency. The key is made from sorted field names
-        fields_values = sorted([(field, value) for field, value in fields.items()],
-                               key=lambda entry: entry[0])
+        fields_values = sorted(
+            [(field, value) for field, value in fields.items()],
+            key=lambda entry: entry[0],
+        )
         # For each pair, check if the value is again a model
         for index, (field, value) in enumerate(fields_values):
             if issubclass(value.__class__, models.Model):
                 # use the model's related_cache_fieldname to avoid long cache keys
-                fields_values[index] = (field, str(getattr(value, value.related_cache_fieldname)).replace(' ', ''))
+                fields_values[index] = (
+                    field,
+                    str(getattr(value, value.related_cache_fieldname)).replace(' ', ''),
+                )
             else:
                 # Value is a python object. Avoid long keys in str representation.
                 fields_values[index] = (field, str(value).replace(' ', ''))

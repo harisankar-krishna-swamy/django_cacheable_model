@@ -1,4 +1,5 @@
 import setuptools
+
 import django_cacheable_model
 
 with open('../README.md', 'r') as fh:

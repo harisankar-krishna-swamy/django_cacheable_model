@@ -16,10 +16,12 @@ logger.addHandler(logging.NullHandler())
 def chunked_list(long_list, chunk_size=20):
     """Break a long list into chunks"""
     for i in range(0, len(long_list), chunk_size):
-        yield long_list[i: i + chunk_size]
+        yield long_list[i : i + chunk_size]
 
 
-def all_ins_from_cache(model_cls, order_by_fields=None, select_related=(None,), prefetch_objs=(None,)):
+def all_ins_from_cache(
+    model_cls, order_by_fields=None, select_related=(None,), prefetch_objs=(None,)
+):
     """
     For Model class model_cls get 'all' instances from cache or get from DB and update cache.
     Depending on the size of the table, this may become unviable. So use on small tables.
@@ -42,15 +44,23 @@ def all_ins_from_cache(model_cls, order_by_fields=None, select_related=(None,), 
         logger.info('Cache MISS for key[{0}]'.format(cache_key))
         if not order_by_fields:
             order_by_fields = (model_cls._meta.pk.name,)
-        instances = list(model_cls.objects.all().select_related(*select_related). \
-                         prefetch_related(*prefetch_objs). \
-                         order_by(*order_by_fields))
+        instances = list(
+            model_cls.objects.all()
+            .select_related(*select_related)
+            .prefetch_related(*prefetch_objs)
+            .order_by(*order_by_fields)
+        )
         each_ins_dict = {}
         if len(instances):
             # loop in chunked lists
             for chunk in chunked_list(instances, chunk_size=cache_set_many_limit):
                 # For each model instance set the cache entries by pk
-                each_ins_dict.update({instance.ins_cache_key_by_fields(): (instance,) for instance in chunk})
+                each_ins_dict.update(
+                    {
+                        instance.ins_cache_key_by_fields(): (instance,)
+                        for instance in chunk
+                    }
+                )
                 cache.set_many(each_ins_dict)
                 each_ins_dict.clear()
             # set the cache entry for all
@@ -58,10 +68,13 @@ def all_ins_from_cache(model_cls, order_by_fields=None, select_related=(None,), 
     return instances
 
 
-def model_ins_from_cache_by_fields(model_cls, fields,
-                                   latest_field_name=None,
-                                   select_related=(None,),
-                                   prefetch_objs=(None,)):
+def model_ins_from_cache_by_fields(
+    model_cls,
+    fields,
+    latest_field_name=None,
+    select_related=(None,),
+    prefetch_objs=(None,),
+):
     """
     Try to get cached model instance with primary key pk. If not get from db and store in cache.
     @param model_cls: Django model class
@@ -84,9 +97,11 @@ def model_ins_from_cache_by_fields(model_cls, fields,
         logger.info('Cache MISS for key[{0}]'.format(cache_key))
         try:
             # queryset
-            model_ins = model_cls.objects.filter(**fields) \
-                .select_related(*select_related) \
+            model_ins = (
+                model_cls.objects.filter(**fields)
+                .select_related(*select_related)
                 .prefetch_related(*prefetch_objs)
+            )
             # make instances by evaluating queryset
             if latest_field_name is not None:
                 model_ins = (model_ins.latest(latest_field_name),)
@@ -134,7 +149,9 @@ def set_cache_key(key, data, timeout=TIMEOUT):
     :param data: cacheable data
     :return: True if everything went ok else False
     """
-    logger.debug('Trying to set_cache_key for key [{0}] with data [{1}]'.format(key, data))
+    logger.debug(
+        'Trying to set_cache_key for key [{0}] with data [{1}]'.format(key, data)
+    )
     success = False
     try:
         cache.set(key, data, timeout=timeout)
@@ -158,7 +175,9 @@ def invalidate_cache_on_model_updates(cls, fields):
         cache_key_all = cls.cache_key_all()
         cache.delete(cache_key_on_fields)
         cache.delete(cache_key_all)
-        logger.debug('Invalidated cache keys {0} {1}'.format(cache_key_on_fields, cache_key_all))
+        logger.debug(
+            'Invalidated cache keys {0} {1}'.format(cache_key_on_fields, cache_key_all)
+        )
     except Exception as e:
         success = False
         logger.exception(e)

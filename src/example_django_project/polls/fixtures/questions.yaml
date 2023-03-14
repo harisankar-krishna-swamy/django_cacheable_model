@@ -1,0 +1,11 @@
+-   model: polls.question
+    pk: 1
+    fields:
+        question_text: 'Which one is a good extra topping on pizzas?'
+        pub_date: 2022-12-25 01:40:48.126660+00:00
+
+-   model: polls.question
+    pk: 2
+    fields:
+        question_text: 'Which one is best month of year?'
+        pub_date: 2022-12-25 01:40:48.126660+00:00

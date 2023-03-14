@@ -1,0 +1,42 @@
+-   model: polls.choice
+    pk: 1
+    fields:
+        question: 1
+        choice_text: Olives
+        votes: 10
+
+-   model: polls.choice
+    pk: 2
+    fields:
+        question: 1
+        choice_text: Cheese
+        votes: 10
+
+-   model: polls.choice
+    pk: 3
+    fields:
+        question: 2
+        choice_text: January
+        votes: 2
+
+-   model: polls.choice
+    pk: 4
+    fields:
+        question: 2
+        choice_text: February
+        votes: 10
+
+-   model: polls.choice
+    pk: 5
+    fields:
+        question: 2
+        choice_text: March
+        votes: 10
+
+-   model: polls.choice
+    pk: 6
+    fields:
+        question: 2
+        choice_text: December
+        votes: 12
+

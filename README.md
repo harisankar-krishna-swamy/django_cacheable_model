@@ -15,18 +15,19 @@ pip install django_cacheable_model
 
 # 3. Usage
 
+See samples in  `example_django_project` views.py and models.py.
+
 ### 3.1. Create a model that inherits from CacheableModel
 ```python
-class Dota2Player(CacheableModel):
-    # when this model appears in cache key of another model this is used
-    related_cache_fieldname = 'steamid'
+class Question(CacheableModel):
+    question_text = models.CharField(max_length=200)
+    pub_date = models.DateTimeField('date published')
 
-    name = models.CharField(unique= False, db_index=True, blank=False, max_length = 30, verbose_name= 'Player name')
-    steamid = models.BigIntegerField(verbose_name = 'Steam id', unique = True, blank = False, db_index = True,
-                                     validators = [MinValueValidator(1, 'Steamid for player must be greater than 0'),])
 
-    def __str__(self):
-        return '{0}(name={1},id={2})'.format(self.__class__.__name__, self.name, self.steamid).replace(' ', '_')
+class Choice(CacheableModel):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    choice_text = models.CharField(max_length=200)
+    votes = models.IntegerField(default=0)
 ```
 
 ### 3.2. Use cache operations from django_cacheable_model.utils
@@ -34,21 +35,22 @@ class Dota2Player(CacheableModel):
 from django_cacheable_model.utils import all_ins_from_cache, model_ins_from_cache_by_fields
 
 # Get all instances of model from cache (use for smaller set of models)
-context['players'] = all_ins_from_cache(Dota2Player)
+context['choices'] = all_ins_from_cache(Choice)
+
+# Get all instances with select_related and order_by
+choices = all_ins_from_cache(Choice, 
+                             select_related=('question',), 
+                             order_by_fields=('-pk',))
 
 # Get a single model
-context['player'] = model_ins_from_cache_by_fields(Dota2Player, {'steamid': steamid})[-1]
+context['choice'] = model_ins_from_cache_by_fields(Choice, {'id': 5})[-1]
 ```
 
 # 4. To do
-a) Add a sample project  
-b) Add tests  
-c) Cleanup code from AIModelStore  
-d) Document use of select_related and prefetch_related  
-e) Check with newer version of Django (was built when Django was at 1.10)  
-f) Remove Python2 styles
+a) Add more tests  
+b) Document use of prefetch_related  
+c) Remove Python2 styles
 
 
 # 5. License
-This was coded sometime ago during Django 1.10 and is open source now.
 Apache2 License

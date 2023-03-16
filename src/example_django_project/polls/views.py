@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from django_cacheable_model.utils import (all_ins_from_cache,
-                                          model_ins_from_cache_by_fields)
+                                          model_ins_from_cache)
 
 
 class AllChoices(APIView):
@@ -25,13 +25,13 @@ class AllQuestions(APIView):
 
 class QuestionDetail(APIView):
     def get(self, request, id=None, format=None):
-        question = model_ins_from_cache_by_fields(Question, {'id': id})[0]
+        question = model_ins_from_cache(Question, {'id': id})[0]
         serializer = QuestionSerializer(question, many=False)
         return Response(serializer.data)
 
 
 class ChoicesOnQuestion(APIView):
     def get(self, request, id=None, format=None):
-        choices = model_ins_from_cache_by_fields(Choice, {'question': id})
+        choices = model_ins_from_cache(Choice, {'question': id})
         serializer = ChoiceSerializer(choices, context={'request': request}, many=True)
         return Response(serializer.data)

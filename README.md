@@ -2,7 +2,7 @@
 A cacheable model for django.
 
 * A generic way of creating cache keys from Django model fields
-* Retrieve django models from cache with field values (cache along the way if not found)
+* Retrieve django models from cache with field values (cache on the way if cache missed)
 * Retrieve all the model instances (suitable for small set of models)
 
 See usage example below
@@ -31,26 +31,25 @@ class Choice(CacheableModel):
 ```
 
 ### 3.2. Use cache operations from django_cacheable_model.utils
+
 ```python
-from django_cacheable_model.utils import all_ins_from_cache, model_ins_from_cache_by_fields
+from django_cacheable_model.utils import all_ins_from_cache, model_ins_from_cache
 
 # Get all instances of model from cache (use for smaller set of models)
 context['choices'] = all_ins_from_cache(Choice)
 
 # Get all instances with select_related and order_by
-choices = all_ins_from_cache(Choice, 
-                             select_related=('question',), 
-                             order_by_fields=('-pk',))
+choices = all_ins_from_cache(Choice,
+                             select_related=('question',),
+                             order_by_fields=('-id',))
 
 # Get a single model
-context['choice'] = model_ins_from_cache_by_fields(Choice, {'id': 5})[-1]
+context['choice'] = model_ins_from_cache(Choice, {'id': 5})[-1]
 ```
 
 # 4. To do
 a) Add more tests  
-b) Document use of prefetch_related  
-c) Remove Python2 styles
-
+b) Document use of prefetch_related
 
 # 5. License
 Apache2 License

@@ -43,13 +43,12 @@ choices = all_ins_from_cache(Choice,
                              select_related=('question',),
                              order_by_fields=('-id',))
 
-# Get a single model
+# Get a single model. Note this method returns a list of matching objects
 context['choice'] = model_ins_from_cache(Choice, {'id': 5})[-1]
 ```
 
 # 4. To do
-a) Add more tests  
-b) Document use of prefetch_related
+a) Example and document use of prefetch_related
 
 # 5. License
 Apache2 License

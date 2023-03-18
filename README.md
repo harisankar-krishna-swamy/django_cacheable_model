@@ -52,3 +52,32 @@ a) Example and document use of prefetch_related
 
 # 5. License
 Apache2 License
+
+# 6. Development
+
+## 6.1 Python
+
+Python 3.10.10 is used for development. Pyenv is used for managing Python versions.  
+Install dev requirements in `dev-requirements.txt`
+```bash
+# in root folder
+# Set python version for project folder using pyenv
+pyenv local 3.10.10
+# Create virtual environment 
+python3 -m venv .venv
+# Activate the virtual environment
+source .venv/bin/activate
+# Install all packages
+pip install -r dev-requirements.txt
+pre-commit install
+```
+## 6.2 IDE (PyCharm) setup
+Set Python interpreter to the virtual env created  
+Set `.venv` folder as excluded in Pycharm  
+Set `src` folder as source root  
+For test runs from IDE set `src` as working directory
+## 6.3 Test
+```bash
+cd src
+pytest
+```

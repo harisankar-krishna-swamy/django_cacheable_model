@@ -13,11 +13,17 @@ https://github.com/harisankar-krishna-swamy/django_cacheable_model
 # 2. Install
 pip install django_cacheable_model
 
-# 3. Usage
+# 3. Configuration
+* `CACHE_SET_MANY_LIMIT` is chunk size for calls to `cache.set_many`.  
+   when `all_ins_from_cache` brings in all entries from cache, it will set each object  
+   in chunks to control request size. Default is `5` i.e if there are 10 instances of a model  
+   from db this config will set each of the models to the cache in two groups of `5`
+
+# 4. Usage
 
 See samples in  `example_django_project` views.py and models.py.
 
-### 3.1. Create a model that inherits from CacheableModel
+### 4.1. Create a model that inherits from CacheableModel
 ```python
 class Question(CacheableModel):
     question_text = models.CharField(max_length=200)
@@ -30,7 +36,7 @@ class Choice(CacheableModel):
     votes = models.IntegerField(default=0)
 ```
 
-### 3.2. Use cache operations from django_cacheable_model.utils
+### 4.2. Use cache operations from django_cacheable_model.utils
 
 ```python
 from django_cacheable_model.utils import all_ins_from_cache, model_ins_from_cache
@@ -47,15 +53,17 @@ choices = all_ins_from_cache(Choice,
 context['choice'] = model_ins_from_cache(Choice, {'id': 5})[-1]
 ```
 
-# 4. To do
-a) Example and document use of prefetch_related
+# 5. To do
+a) Example and document use of prefetch_related  
+b) Doc and tests for util methods  
+c) `timeout` in documentation
 
-# 5. License
+# 6. License
 Apache2 License
 
-# 6. Development
+# 7. Development
 
-## 6.1 Python
+## 7.1 Python
 
 Python 3.10.10 is used for development. Pyenv is used for managing Python versions.  
 Install dev requirements in `dev-requirements.txt`
@@ -71,12 +79,12 @@ source .venv/bin/activate
 pip install -r dev-requirements.txt
 pre-commit install
 ```
-## 6.2 IDE (PyCharm) setup
+## 7.2 IDE (PyCharm) setup
 Set Python interpreter to the virtual env created  
 Set `.venv` folder as excluded in Pycharm  
 Set `src` folder as source root  
 For test runs from IDE set `src` as working directory
-## 6.3 Test
+## 7.3 Test
 ```bash
 cd src
 pytest

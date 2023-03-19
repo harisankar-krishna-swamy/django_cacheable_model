@@ -15,11 +15,16 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/harisankar-krishna-swamy/django_cacheable_model.git",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude=["tests*"]),
+    install_requires=["django>=2.0"],
     python_requires='>=3.7.4, <4',
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
+    keywords='django cacheable model',
+    project_urls={
+        "GitHub": "https://github.com/harisankar-krishna-swamy/django_cacheable_model.git"
+    },
 )

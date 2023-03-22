@@ -2,6 +2,9 @@ from django.db import models
 
 
 class CacheableModel(models.Model):
+    # Update this version when model changes (migrations) to differentiate model versions in cache
+    version = 1
+
     """
     When model appears as a Foreignkey or one-to-one, 'related_cache_fieldname' is the model field from which the value
     is taken for cache key. For example: as cache key for Player totals may need to indicate the player (foreign key)
@@ -13,7 +16,7 @@ class CacheableModel(models.Model):
 
     @classmethod
     def cache_key_all(cls) -> str:
-        return f'{cls.__name__}.all'
+        return f'{cls.__name__}.v{cls.version}.all'
 
     @classmethod
     def ins_cache_key_with_field_values(cls, fields: dict) -> str:
@@ -28,7 +31,7 @@ class CacheableModel(models.Model):
             [(field, value) for field, value in fields.items()],
             key=lambda entry: entry[0],
         )
-        key_parts = [f'{cls.__name__}']
+        key_parts = [f'{cls.__name__}.v{cls.version}']
         # For each pair, check if the value is again a model
         for index, (field, value) in enumerate(fields_values):
             if issubclass(value.__class__, models.Model):

@@ -1,4 +1,5 @@
 from ddt import data, ddt, unpack
+from django.core.cache import cache
 from django.test import TestCase
 from polls.models import Choice
 
@@ -9,6 +10,7 @@ from tests.factories import ChoiceFactory, QuestionFactory
 @ddt
 class TestUtilsCachedModel(TestCase):
     def setUp(self) -> None:
+        cache.clear()
         self.question = QuestionFactory()
         self.choice = ChoiceFactory(question=self.question)
 
@@ -19,11 +21,11 @@ class TestUtilsCachedModel(TestCase):
         )
         fields_1 = model_1._meta.get_fields()
         fields_2 = model_1._meta.get_fields()
-        self.assertEquals(
+        self.assertEqual(
             len(fields_1), len(fields_2), 'Fields count did not match on cached model'
         )
         for f in fields_1:
-            self.assertEquals(
+            self.assertEqual(
                 getattr(model_1, f.name),
                 getattr(model_2, f.name),
                 f'Value mismatch on field {f} between ' f'model and cached model',

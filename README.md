@@ -85,6 +85,16 @@ Set `.venv` folder as excluded in Pycharm
 Set `src` folder as source root  
 For test runs from IDE set `src` as working directory
 ## 7.3 Test
+1. Start memcached container for caching
+```bash
+cd src/tests/containers
+# pull container and 
+docker-compose pull
+docker-compose up -d
+# Check container is running
+docker ps
+```
+2. Run tests
 ```bash
 cd src
 pytest

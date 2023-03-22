@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.test import TestCase
 from polls.models import Choice, Question
 
@@ -8,6 +9,7 @@ from tests.factories import ChoiceFactory, QuestionFactory
 
 class TestUtilsSQLQueryCount(TestCase):
     def setUp(self) -> None:
+        cache.clear()
         q1, q2 = QuestionFactory(), QuestionFactory()
         self.questions = (
             q1,

@@ -2,8 +2,7 @@ from django.core.cache import cache
 from django.test import TestCase
 from polls.models import Choice, Question
 
-from django_cacheable_model.utils import (all_ins_from_cache,
-                                          model_ins_from_cache)
+from django_cacheable_model.utils import all_ins_from_cache, model_ins_from_cache
 from tests.factories import ChoiceFactory, QuestionFactory
 
 

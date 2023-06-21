@@ -1,5 +1,5 @@
 [run]
-source = django_hmac_authentication
+source = django_cacheable_model
 data_file = tests/coverage/.coverage
 omit = */migrations/*
 branch = true

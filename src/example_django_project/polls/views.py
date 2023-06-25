@@ -3,8 +3,7 @@ from polls.serializers import ChoiceSerializer, QuestionSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from django_cacheable_model.utils import (all_ins_from_cache,
-                                          model_ins_from_cache)
+from django_cacheable_model.utils import all_ins_from_cache, model_ins_from_cache
 
 
 class AllChoices(APIView):

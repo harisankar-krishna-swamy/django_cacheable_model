@@ -4,26 +4,40 @@ A cacheable model for django.
 * A generic way of creating cache keys from Django model fields
 * Retrieve django models from cache with field values (cache on the way if cache missed)
 * Retrieve all the model instances (suitable for small set of models)
+* Support for cache aliases
 
 See usage example below
 
-# 1. Github
-https://github.com/harisankar-krishna-swamy/django_cacheable_model
-
-# 2. Install
+# 1. Install
 pip install django_cacheable_model
 
-# 3. Configuration
+# 2. Configuration
+* `DEFAULT_CACHE_ALIAS` the default cache name to use from `settings.CACHES`. 
+   If not set default alias is name `"default"` and must be configured in CACHES.
 * `CACHE_SET_MANY_LIMIT` is chunk size for calls to `cache.set_many`.  
    when `all_ins_from_cache` brings in all entries from cache, it will set each object  
    in chunks to control request size. Default is `5` i.e if there are 10 instances of a model  
    from db this config will set each of the models to the cache in two groups of `5`
+```python
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# 4. Usage
+CACHE_DEFAULT_ALIAS = 'example_cache_alias'
+CACHE_SET_MANY_LIMIT = 10
+CACHES = {
+   ...,
+    'example_cache_alias': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'LOCATION': 'memcached:11211',
+    },
+    ...
+}
+```
+
+# 3. Usage
 
 See samples in  `example_django_project` views.py and models.py.
 
-### 4.1. Create a model that inherits from CacheableModel
+### 3.1. Create a model that inherits from CacheableModel
 ```python
 class Question(CacheableModel):
     question_text = models.CharField(max_length=200)
@@ -36,7 +50,7 @@ class Choice(CacheableModel):
     votes = models.IntegerField(default=0)
 ```
 
-### 4.2. Use cache operations from django_cacheable_model.utils
+### 3.2. Use cache operations from django_cacheable_model.utils
 
 ```python
 from django_cacheable_model.utils import all_ins_from_cache, model_ins_from_cache
@@ -53,49 +67,5 @@ choices = all_ins_from_cache(Choice,
 context['choice'] = model_ins_from_cache(Choice, {'id': 5})[-1]
 ```
 
-# 5. To do
-a) Example and document use of prefetch_related  
-b) Doc and tests for util methods  
-c) `timeout` in documentation
-
-# 6. License
+# 4. License
 Apache2 License
-
-# 7. Development
-
-## 7.1 Python
-
-Python 3.10.10 is used for development. Pyenv is used for managing Python versions.  
-Install dev requirements in `dev-requirements.txt`
-```bash
-# in root folder
-# Set python version for project folder using pyenv
-pyenv local 3.10.10
-# Create virtual environment 
-python3 -m venv .venv
-# Activate the virtual environment
-source .venv/bin/activate
-# Install all packages
-pip install -r dev-requirements.txt
-pre-commit install
-```
-## 7.2 IDE (PyCharm) setup
-Set Python interpreter to the virtual env created  
-Set `.venv` folder as excluded in Pycharm  
-Set `src` folder as source root  
-For test runs from IDE set `src` as working directory
-## 7.3 Test
-1. Start memcached container for caching
-```bash
-cd src/tests/containers
-# pull container and 
-docker-compose pull
-docker-compose up -d
-# Check container is running
-docker ps
-```
-2. Run tests
-```bash
-cd src
-pytest
-```

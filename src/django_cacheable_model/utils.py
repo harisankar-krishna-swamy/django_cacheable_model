@@ -1,10 +1,11 @@
 from typing import Iterable
 
 from django.conf import settings
-from django.core.cache import cache
+from django.core.cache import caches
 from django.db import models
 
-TIMEOUT = settings.CACHE_TIMEOUT
+cache_set_many_limit = getattr(settings, 'CACHE_SET_MANY_LIMIT', 5)
+default_cache_alias = getattr(settings, 'DEFAULT_CACHE_ALIAS', 'default')
 
 
 def chunked_list(long_list, chunk_size=20):
@@ -14,7 +15,11 @@ def chunked_list(long_list, chunk_size=20):
 
 
 def all_ins_from_cache(
-    model_cls, order_by_fields=None, select_related=(None,), prefetch_objs=(None,)
+    model_cls,
+    order_by_fields=None,
+    select_related=(None,),
+    prefetch_objs=(None,),
+    cache_alias=default_cache_alias,
 ) -> Iterable:
     """
     For Model class model_cls get 'all' instances from cache or get from DB and update cache.
@@ -25,14 +30,15 @@ def all_ins_from_cache(
     @param prefetch_objs: tuple of Prefetch class objects. *WARNING* on size of prefetched rows. Bring in only needed
     columns using .only on Prefetch queryset. Ensure .only also has foreign keys.
     Example: PageWordCount.objects.all().only('id', 'created_at', 'web_page').order_by('-created_at')
-    Ref: https://docs.djangoproject.com/en/1.10/ref/models/querysets/#prefetch-objects
+    Ref: https://docs.djangoproject.com/en/4.2/ref/models/querysets/#prefetch-objects
+    @param cache_alias: name of cache in Django's CACHES settings
     @return: list of all instances of model_cls currently in db
     """
     assert model_cls is not None
     assert issubclass(model_cls, models.Model)
-    cache_set_many_limit = getattr(settings, 'CACHE_SET_MANY_LIMIT', 5)
-
+    cache = caches[cache_alias]
     cache_key = model_cls.cache_key_all()
+
     instances = cache.get(cache_key)
     if instances is None:
         if not order_by_fields:
@@ -67,6 +73,7 @@ def model_ins_from_cache(
     latest_field_name: str = None,
     select_related: Iterable = (None,),
     prefetch_objs: Iterable = (None,),
+    cache_alias=default_cache_alias,
 ) -> Iterable:
     """
     Try to get cached model instance with primary key pk. If not get from db and store in cache.
@@ -77,13 +84,15 @@ def model_ins_from_cache(
     @param prefetch_objs: Tuple (iterable) of Prefetch class objects. *WARNING* on size of prefetched rows. Bring in only needed
     columns using .only on Prefetch queryset. Ensure .only also has foreign keys.
     Example: Choice.objects.all().only('id', 'created_at', 'question').order_by('-created_at')
-    Ref: https://docs.djangoproject.com/en/1.10/ref/models/querysets/#prefetch-objects
+    Ref: https://docs.djangoproject.com/en/4.2/ref/models/querysets/#prefetch-objects
+    @param cache_alias: name of cache in Django's CACHES settings
     @return: Tuple of model instances that match or (None, ) if not found
     """
     assert model_cls is not None
     assert issubclass(model_cls, models.Model)
     assert len(fields) > 0
 
+    cache = caches[cache_alias]
     cache_key = model_cls.ins_cache_key_with_field_values(fields)
     model_ins = cache.get(cache_key)
     if model_ins is None:
@@ -107,47 +116,3 @@ def model_ins_from_cache(
             return (None,)
 
     return model_ins
-
-
-def get_cache_data(key):
-    """
-    Get data with key from cache
-    :param key: cache key
-    :return: the data else none
-    """
-    try:
-        data = cache.get(key)
-        return data
-    except Exception:
-        return None
-
-
-def set_cache_key(key, data, timeout=TIMEOUT):
-    """
-    Set data to cache with key
-    :param key: cache key
-    :param data: cacheable data
-    :return: True if everything went ok else False
-    """
-    try:
-        cache.set(key, data, timeout=timeout)
-        return True
-    except Exception:
-        return False
-
-
-def invalidate_cache_on_model_updates(obj, fields):
-    """
-    1. Invalidate model instance's cache key on each field in fields
-    2. Invalidate model instance's all entries cache key
-    :param instance: a CacheableModel class
-    :return: True on success. False on failure
-    """
-    try:
-        cache_key_on_fields = obj.ins_cache_key_with_field_values(fields)
-        cache_key_all = obj.cache_key_all()
-        cache.delete(cache_key_on_fields)
-        cache.delete(cache_key_all)
-        return True
-    except Exception:
-        return False

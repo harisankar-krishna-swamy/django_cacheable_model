@@ -125,13 +125,21 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CACHE_TIMEOUT = 5
+# Optional configuration to change default alias for django_cacheable_model cache calls. CACHES must have alias entry
+# DEFAULT_CACHE_ALIAS = 'my_alias_1'
+
 CACHE_SET_MANY_LIMIT = 10
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
         'LOCATION': 'memcached:11211',
-    }
+        'OPTIONS': {
+            "no_delay": True,
+            "ignore_exc": True,
+            "max_pool_size": 4,
+            "use_pooling": True,
+        },
+    },
 }
 
 if DEBUG:

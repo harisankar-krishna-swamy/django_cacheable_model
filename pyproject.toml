@@ -9,9 +9,9 @@ namespaces = false
 
 [project]
 name = "django_cacheable_model"
-version = "1.1.1"
+version = "1.1.2"
 authors = [
-  { name="Harisankar Krishna Swamy", email="harisankar.krishna@outlook.com" },
+  { name="Harisankar Krishna Swamy @ Vevde", email="harisankar.krishna@outlook.com" },
 ]
 description = "A cacheable Django model"
 readme = "README.md"

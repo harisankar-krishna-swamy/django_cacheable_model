@@ -1,2 +1,2 @@
 name = 'django_cacheable_model'
-version = '1.1.2'
+version = '1.2.0'
